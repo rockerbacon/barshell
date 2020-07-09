@@ -1,0 +1,3 @@
+[submodule "foopak_modules/kward/shunit2"]
+	path = foopak_modules/kward/shunit2
+	url = https://github.com/kward/shunit2
