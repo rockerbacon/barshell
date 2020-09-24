@@ -3,8 +3,8 @@
 project_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/../..")
 
 oneTimeSetUp() {
-	# shellcheck source=tests/setup_environment.sh
-	source "$project_root/tests/setup_environment.sh"
+	# shellcheck source=tests/environment/setup_environment.sh
+	source "$project_root/tests/environment/setup.sh"
 	output=$(./foopak add-src test_src 2>&1)
 }
 

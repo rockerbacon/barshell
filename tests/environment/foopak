@@ -80,16 +80,18 @@ command_type=${config[$i]}
 case "$command_type" in
 _alias_)
 ((i++))
-cmd=("${BASH_SOURCE[0]}" "${config[@]:$i}")
+retval2=("${BASH_SOURCE[0]}" "${config[@]:$i}")
 ;;
 _executable_)
 ((i++))
 ;&
 *)
-cmd=("$module_root/${config[$i]}")
+retval2=("$module_root/${config[$i]}")
 ;;
 esac
-echo "([module_name]='$module_name' [module_root]='$module_root' [cmd]=\"(${cmd[@]@Q})\")"
+export retval0=$module_root
+export retval1=$module_name
+export retval2
 }
 print_remove_help() {
 cat >&2 << EOF
@@ -163,8 +165,11 @@ OPTIONS:
 			default is MODULE with slashes
 			replaced by underscores
 
-	--tag,-t,	use specific tag or commit
-	--commit,-c	default is the latest commit in the default remote
+	--branch,-b	use specific branch
+			default is the default remote branch
+
+	--commit,-c,	use specific tag or commit
+	--tag,-t	default is the latest commit in the default remote
 
 	--dir,-d	add module under different directory
 			default is foopak_modules
@@ -172,15 +177,20 @@ OPTIONS:
 				modules outside 'foopak_modules'
 				will not be scanned for commands
 
-	--branch,-b	use specific branch
-			default is the default remote branch
-
 	--help,-h	print this help message and exit
+
+	--http		use HTTP when adding the module
+			by default, modules are added using HTTPS
+
+	--ssh		use SSH when adding the module
+			by default, modules are added using HTTPS
 
 EOF
 }
 add() {
-git_server="https://github.com"
+protocol_prefix="https://"
+protocol_domain_terminator="/"
+git_server_domain="github.com"
 module_home_relative_dir="foopak_modules"
 module_options=()
 reading_named_args=true
@@ -202,6 +212,16 @@ module_home_relative_dir=$2; shift 2
 --help|-h)
 print_add_help
 return 0
+;;
+--http)
+shift 1
+protocol_prefix="http://"
+protocol_domain_terminator="/"
+;;
+--ssh)
+shift 1
+protocol_prefix="git@"
+protocol_domain_terminator=":"
 ;;
 --*|-*)
 echo "ERROR: Unknown option '$option'" >&2
@@ -233,8 +253,9 @@ if [ -e "$module_install_path" ]; then
 echo "ERROR: could not add module: directory '$module_install_path' already exists" >&2
 return 1
 fi
-cd "$project_root" || return 1
-git submodule add "${module_options[@]}" "$git_server/$module_path" "$module_install_path"
+repository_address="${protocol_prefix}${git_server_domain}${protocol_domain_terminator}${module_path}"
+cd "$project_root" || exit 1
+git submodule add "${module_options[@]}" "$repository_address" "$module_install_path"
 if [ -n "$module_version" ]; then
 restore_workdir=$PWD
 cd "$project_root/$module_install_path" || return 1
@@ -254,11 +275,11 @@ while read -ru 3 command_config || [ -n "$command_config" ]; do
 [ -z "$command_config" ] && continue
 [ "${command_config:0:1}" == "#" ] && continue
 command_name=${command_config%%[[:space:]]*}
-locate_output=$(locate_cmd --exclude-dir "$module_install_path" "$command_name")
+locate_cmd --exclude-dir "$module_install_path" "$command_name"
 found_command=$?
+module_name=$retval1
 if [ "$found_command" == "0" ]; then
-declare -A command_config="$locate_output"
-echo "ERROR: could not add module: command '$command_name' conflicts with module '${command_config[module_name]}'" >&2
+echo "ERROR: could not add module: command '$command_name' conflicts with module '$module_name'" >&2
 remove "$module_alias"
 return 1
 fi
@@ -268,15 +289,15 @@ fi
 }
 exec_module_cmd() {
 command_name=$1; shift
-locate_output=$(locate_cmd "$command_name")
+locate_cmd "$command_name"
 found_command=$?
+module_root=$retval0
+cmd=("${retval2[@]}")
 if [ "$found_command" == "1" ]; then
 echo "ERROR: unknown command '$command_name'" >&2
 return 1
 fi
-declare -A command_config="$locate_output"
-declare -a cmd="${command_config[cmd]}"
-module_root="${command_config[1]}" "${cmd[@]}" "$@"
+module_root="$module_root" "${cmd[@]}" "$@"
 return $?
 }
 main() {
@@ -289,7 +310,15 @@ add|a)
 add "$@"
 ;;
 locate-cmd)
-locate_cmd "$@"
+if locate_cmd "$@"; then
+echo "module_root=$retval0"
+echo "module_name=$retval1"
+echo "cmd=${retval2[@]@Q}"
+else
+echo "Command not found" >&2
+fi
+;;
+source-libs)
 ;;
 *)
 exec_module_cmd "$command" "$@"
