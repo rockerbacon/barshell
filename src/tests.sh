@@ -5,7 +5,7 @@ if [ -z "$project_root" ]; then
 fi
 tests_dir="$project_root/tests"
 
-echo -e "\n######## STARTING TESTS ########\n"
+echo -e "\n######## STARTING TESTS ########\n" >&2
 
 failures=$(
 	find "$tests_dir" \
@@ -24,12 +24,12 @@ failures=$(
 
 echo
 if [ -n "$failures" ]; then
-	echo -e "The following tests failed:"
-	echo "$failures"
+	echo -e "The following tests failed:" >&2
+	echo "$failures" >&2
 	exit 1
 fi
 
 echo "All tests passed!"
 
-echo -e "\n######## ENDING TESTS ########\n"
+echo -e "\n######## ENDING TESTS ########\n" >&2
 

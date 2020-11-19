@@ -1,9 +1,12 @@
 #!/bin/bash
 
-src_dir=$(realpath "$(dirname "${BASH_SOURCE[0]}")/../src")
+export project_root
+export module_root
 
-"$src_dir/check_indentation.sh" &&
-# "$src_dir/shellcheck.sh" &&
-"$src_dir/tests.sh" &&
+project_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/..")
+module_root=$project_root
+
+"$project_root/src/analyze.sh" &&
+"$project_root/src/tests.sh" &&
 echo -e "\nAll checks passed!"
 
