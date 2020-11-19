@@ -19,12 +19,14 @@ test_should_correctly_create_file() {
 }
 
 test_should_correctly_set_project_root() {
+	# shellcheck disable=SC2016
 	assertContains \
 		'project_root=realpath "$(dirname "${BASH_SOURCE[0]}")/.."' \
 		"$(cat tests/test_test.sh)"
 }
 
 test_should_correctly_set_shunit_command() {
+	# shellcheck disable=SC2016
 	assertContains \
 		'. "$project_root/foopak_modules/barshell/shunit2/shunit2"' \
 		"$(cat tests/test_test.sh)"
