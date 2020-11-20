@@ -2,8 +2,6 @@
 
 file=${1:?}
 
-echo "INFO: checking indentation for '$file'" >&2
-
 skip_check=$(grep -o -E '#\s*barshell\s+skip-indentation-check' "$file")
 
 if [ -n "$skip_check" ]; then
@@ -19,6 +17,5 @@ if [ -n "$space_indentation" ]; then
 	exit 1
 fi
 
-echo "INFO: indentation ok" >&2
 exit 0
 

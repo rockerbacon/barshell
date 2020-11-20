@@ -28,7 +28,7 @@ test_should_exit_with_success_code() {
 test_should_check_indentation() {
 	assertContains \
 		"$output" \
-		"checking indentation for './src/fixture_file.sh'"
+		"Analyzing './src/fixture_file.sh'"
 
 	assertContains \
 		"$output" \

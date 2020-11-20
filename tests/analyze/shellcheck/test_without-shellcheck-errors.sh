@@ -29,7 +29,7 @@ test_should_exit_with_success_code() {
 test_should_inform_shellcheck_analysis_was_done() {
 	assertContains \
 		"$output" \
-		"running shellcheck analysis on './src/fixture_file.sh'"
+		"Analyzing './src/fixture_file.sh'"
 
 	assertContains \
 		"$output" \

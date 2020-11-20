@@ -3,12 +3,17 @@
 analyze_file() {
 	local file_path=${1:?}
 
-	"${module_root:?}/src/check_indentation.sh" "$file_path"
+	echo "Analyzing '$file_path'" >&2
+	echo -e "\tchecking indentation" >&2
+	"${module_root:?}/src/check_indentation.sh" "$file_path" &&
+		echo -e "\tindentation ok" >&2
 	local indentation_status=$?
 
-	echo "INFO: running shellcheck analysis on '$file_path'" >&2
-	shellcheck -x "$file_path" && echo "INFO: shellcheck analysis ok" >&2
+	echo -e "\trunning shellcheck analysis" >&2
+	shellcheck -x "$file_path" && echo -e "\tshellcheck analysis ok" >&2
 	local shellcheck_status=$?
+
+	echo
 
 	export retval0
 	retval0=$((indentation_status + shellcheck_status))
