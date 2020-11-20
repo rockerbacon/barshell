@@ -25,8 +25,6 @@ exec_single_test() {
 
 	local slim_test_name=${test_script#$tests_root/}
 
-	echo "$test_script,$slim_test_name,$tests_dir" >&2
-
 	echo "Running '$slim_test_name'" 1>&2
 	"$test_script" 1>&2
 	local exit_status=$?
