@@ -12,10 +12,14 @@ oneTimeTearDown() {
 	teardown_environment
 }
 
-test_should_correctly_create_file() {
+test_should_correctly_create_executable_file() {
 	assertTrue \
 		"file 'tests/subtest/test_src.sh' not found:\n$output\n" \
 		"test -f tests/subtest/test_src.sh"
+
+	assertTrue \
+		"file 'tests/subtest/test_src.sh' does not have executable permissions:\n$output\n" \
+		"test -x tests/subtest/test_src.sh"
 }
 
 test_should_correctly_set_project_root() {

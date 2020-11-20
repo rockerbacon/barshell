@@ -2,7 +2,7 @@
 
 # barshell skip-indentation-check
 
-project_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/../..")
+project_root=$(realpath "$(dirname "${BASH_SOURCE[0]}")/../../..")
 
 oneTimeSetUp() {
 	# shellcheck source=tests/environment/setup.sh
