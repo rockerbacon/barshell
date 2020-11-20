@@ -9,8 +9,9 @@ oneTimeSetUp() {
 	mkdir src
 cat << EOF > src/fixture_file.sh
 #!/bin/sh
-	if tab_indented_line; then
-		tab_indented_command
+	exec_cmd=\$1
+	if [ -n "\$exec_cmd" ]; then
+		command
 	fi
 EOF
 
@@ -25,14 +26,14 @@ test_should_exit_with_success_code() {
 	assertEquals "exited with error code '$exit_code':\n$output\n\n" "0" "$exit_code"
 }
 
-test_should_check_indentation() {
+test_should_inform_shellcheck_analysis_was_done() {
 	assertContains \
 		"$output" \
-		"checking indentation for './src/fixture_file.sh'"
+		"running shellcheck analysis on './src/fixture_file.sh'"
 
 	assertContains \
 		"$output" \
-		"indentation ok"
+		"shellcheck analysis ok"
 }
 
 # shellcheck disable=SC1090

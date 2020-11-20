@@ -9,8 +9,9 @@ oneTimeSetUp() {
 	mkdir src
 cat << EOF > src/fixture_file.sh
 #!/bin/sh
-	if tab_indented_line; then
-		tab_indented_command
+	# missing quotes around unassigned variable
+	if [ -n \$exec_cmd ]; then
+		command
 	fi
 EOF
 
@@ -21,18 +22,22 @@ oneTimeTearDown() {
 	teardown_environment
 }
 
-test_should_exit_with_success_code() {
-	assertEquals "exited with error code '$exit_code':\n$output\n\n" "0" "$exit_code"
+test_should_exit_with_error_code() {
+	assertNotEquals "exited with success code:\n$output\n\n" "0" "$exit_code"
 }
 
-test_should_check_indentation() {
+test_should_output_shellcheck_errors_and_warnings() {
 	assertContains \
 		"$output" \
-		"checking indentation for './src/fixture_file.sh'"
+		"SC2070"
 
 	assertContains \
 		"$output" \
-		"indentation ok"
+		"SC2154"
+
+	assertContains \
+		"$output" \
+		"SC2086"
 }
 
 # shellcheck disable=SC1090

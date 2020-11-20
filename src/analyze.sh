@@ -6,7 +6,8 @@ analyze_file() {
 	"${module_root:?}/src/check_indentation.sh" "$file_path"
 	local indentation_status=$?
 
-	shellcheck -x "$file_path"
+	echo "INFO: running shellcheck analysis on '$file_path'" >&2
+	shellcheck -x "$file_path" && echo "INFO: shellcheck analysis ok" >&2
 	local shellcheck_status=$?
 
 	export retval0
